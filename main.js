@@ -56,26 +56,26 @@ class Trai {
     }
 }
 class Brin {
-    constructor(x, y, det) {
+    constructor(x, y, det, long) {
         this.x = x
         this.y = y
         this.childs = new Array(det);
         for (let i = 0; i < det; i++) {
             this.childs[i] = new Trai("green");
-            this.childs[i].long = i / det * 10;
+            this.childs[i].long = long / det
         }
     }
     draw() {
-        let v = [this.x, this.y]
-        this.lessgo = distance(msx, msy, v[0], v[1]) < 100
+        this.v = [this.x, this.y]
+        this.lessgo = distance(msx, msy, this.v[0], this.v[1]) < 100
         for (const tr of this.childs) {
 
             if (this.lessgo) {
-                tr.update(v[0], v[1], msx, msy);
+                tr.update(this.v[0], this.v[1], msx, msy);
             } else {
-                tr.update(v[0], v[1], v[0], v[1] + 10);
+                tr.update(this.v[0], this.v[1], this.v[0], this.v[1] + 10);
             }
-            v = tr.draw(v[0], v[1])
+            this.v = tr.draw(this.v[0], this.v[1])
 
         }
     }
@@ -85,8 +85,10 @@ class Brin {
     }
 }
 let brins = new Array();
-for (let i = 0; i < 25; i++) {
-    brins.push(new Brin(W / 2 + (i % 5) * 5, H / 2 + parseInt(i / 5) * 5, i));
+const w = parseInt(W / 50),
+    h = parseInt(H / 50);
+for (let i = 0; i < w * h; i++) {
+    brins.push(new Brin((i % w) * 10, parseInt(i / h) * 10, 4, 100));
 }
 
 
