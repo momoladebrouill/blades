@@ -15,8 +15,7 @@ context.textBaseline = "middle"
 
 canvas.addEventListener("mousedown", (e) => { lessgo = !lessgo; });
 canvas.addEventListener("mousemove", mousemove);
-//canvas.addEventListener("wheel",roll,{passive:true});
-//window.addEventListener("mouseup",mouseup);
+
 let msx = 0,
     lessgo = false,
     msy = 0;
@@ -30,6 +29,7 @@ function distance(x1, y1, x2, y2) {
     return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 const TAU = Math.PI * 2;
+let diff;
 class Trai {
     constructor(couleur) {
         this.angle = 0;
@@ -38,8 +38,11 @@ class Trai {
         this.long = 100;
     }
     update(x, y, awayx, awayy) {
-        this.angle = this.angle % TAU
-        this.angle -= (this.angle - Math.atan2(awayy - y, awayx - x) + Math.PI) * 0.1
+        diff = this.angle % TAU - Math.atan2(y - awayy, x - awayx);
+        if (Math.abs(diff) > Math.PI) {
+            diff -= Math.sign(diff) * TAU;
+        }
+        this.angle -= (diff) * 0.1;
         this.v[0] = x + Math.cos(this.angle) * this.long;
         this.v[1] = y + Math.sin(this.angle) * this.long;
 
@@ -79,16 +82,13 @@ class Brin {
 
         }
     }
-    update() {
-
-
-    }
 }
 let brins = new Array();
-const w = parseInt(W / 50),
-    h = parseInt(H / 50);
+const ecart = 50;
+const w = parseInt(W / ecart),
+    h = parseInt(H / ecart);
 for (let i = 0; i < w * h; i++) {
-    brins.push(new Brin((i % w) * 10, parseInt(i / h) * 10, 4, 100));
+    brins.push(new Brin((i % w) * ecart, parseInt(i / h) * ecart, 4, 100));
 }
 
 
