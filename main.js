@@ -9,53 +9,45 @@ canvas.style.width = W + "px";
 canvas.style.height = H + "px";
 context.scale(ratio, ratio);
 
-context.font = "50px cursive";
-context.textBaseline = "middle"
+context.lineWidth = 2;
 
-
-canvas.addEventListener("mousedown", (e) => { lessgo = !lessgo; });
-canvas.addEventListener("mousemove", mousemove);
-
+const TAU = Math.PI * 2;
 let msx = 0,
-    lessgo = false,
-    msy = 0;
+    msy = 0,
+    time = true;
+
+
+canvas.addEventListener("mousemove", mousemove);
+canvas.addEventListener("click", (e) => { time = !time; });
 
 function mousemove(e) {
     msx = e.clientX;
     msy = e.clientY;
 }
 
-function distance(x1, y1, x2, y2) {
-    return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-}
-const TAU = Math.PI * 2;
-let diff;
+
+function distance(x1, y1, x2, y2) { return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)); }
+
+
+
 class Trai {
-    constructor(couleur) {
+    constructor(l) {
         this.angle = 0;
-        this.couleur = couleur;
+        this.long = l;
         this.v = new Array(2);
-        this.long = 100;
     }
     update(x, y, awayx, awayy) {
-        diff = this.angle % TAU - Math.atan2(y - awayy, x - awayx);
-        if (Math.abs(diff) > Math.PI) {
-            diff -= Math.sign(diff) * TAU;
-        }
+        let diff = (this.angle % TAU) - Math.atan2(y - awayy, x - awayx);
+        if (Math.abs(diff) > Math.PI) { diff -= Math.sign(diff) * TAU; }
         this.angle -= (diff) * 0.1;
-        this.v[0] = x + Math.cos(this.angle) * this.long;
-        this.v[1] = y + Math.sin(this.angle) * this.long;
+
 
     }
     draw(x, y) {
-        context.beginPath();
+        this.v[0] = x + Math.cos(this.angle) * this.long;
+        this.v[1] = y + Math.sin(this.angle) * this.long;
         context.moveTo(x, y);
         context.lineTo(this.v[0], this.v[1]);
-        context.strokeStyle = this.couleur;
-        context.stroke();
-        context.closePath();
-        return this.v;
-
     }
 }
 class Brin {
@@ -63,34 +55,39 @@ class Brin {
         this.x = x
         this.y = y
         this.childs = new Array(det);
+        this.couleur = 'green';
+        this.brightCouleur = 'lightgreen';
         for (let i = 0; i < det; i++) {
-            this.childs[i] = new Trai("green");
-            this.childs[i].long = long / det
+            this.childs[i] = new Trai(long / det);
         }
     }
     draw() {
-        this.v = [this.x, this.y]
-        this.lessgo = distance(msx, msy, this.v[0], this.v[1]) < 100
+        let v = [this.x, this.y]
+        this.lessgo = distance(msx, msy, v[0], v[1]) < 100;
+        context.beginPath();
         for (const tr of this.childs) {
 
             if (this.lessgo) {
-                tr.update(this.v[0], this.v[1], msx, msy);
-            } else {
-                tr.update(this.v[0], this.v[1], this.v[0], this.v[1] + 10);
+                tr.update(v[0], v[1], msx, msy);
+            } else if (time) {
+                tr.update(v[0], v[1], v[0], v[1] + 10);
             }
-            this.v = tr.draw(this.v[0], this.v[1])
-
+            tr.draw(v[0], v[1])
+            v = [tr.v[0], tr.v[1]];
         }
+        context.strokeStyle = this.lessgo ? this.brightCouleur : this.couleur;
+        context.stroke();
+        context.closePath();
     }
 }
 let brins = new Array();
-const ecart = 50;
-const w = parseInt(W / ecart),
-    h = parseInt(H / ecart);
-for (let i = 0; i < w * h; i++) {
-    brins.push(new Brin((i % w) * ecart, parseInt(i / h) * ecart, 4, 100));
-}
+const ecart = 20;
 
+for (let y = 0; y < H; y += ecart) {
+    for (let x = 0; x < W; x += ecart) {
+        brins.push(new Brin(x + (Math.random() - .5) * 0, y, 2, 30));
+    }
+}
 
 function bLoop() {
     context.beginPath();
