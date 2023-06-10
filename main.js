@@ -81,11 +81,11 @@ class Brin {
     }
 }
 let brins = new Array();
-const ecart = 20;
+const ecart = 10;
 
-for (let y = 0; y < H; y += ecart) {
-    for (let x = 0; x < W; x += ecart) {
-        brins.push(new Brin(x + (Math.random() - .5) * 0, y, 2, 30));
+for (let y = 0; y < H/2; y += ecart) {
+    for (let x = 0; x < W/2; x += ecart) {
+        brins.push(new Brin(W/4 + x + (Math.random() - .5) * 10, H/4+y+ (Math.random()-.5)*10, 2, 30));
     }
 }
 
